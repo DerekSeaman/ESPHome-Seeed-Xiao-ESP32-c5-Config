@@ -27,7 +27,7 @@ api:
     key: ${api_key}
   reboot_timeout: 15min
 
- ota:
+ota:
   - platform: esphome
     password: ${ota_password}
     version: 2

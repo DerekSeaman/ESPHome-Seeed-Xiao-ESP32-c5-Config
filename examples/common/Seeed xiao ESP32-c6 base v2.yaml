@@ -3,23 +3,9 @@ esp32:
   board: seeed_xiao_esp32c6
   framework:
     type: esp-idf
-    version: recommended
     sdkconfig_options:
-      # Enable Bluetooth and NimBLE, disable Bluedroid
-      CONFIG_BT_ENABLED: "y"
-      CONFIG_BT_BLUEDROID_ENABLED: "n"
-      CONFIG_BT_NIMBLE_ENABLED: "y"
-
-      # Roles (peripheral/broadcaster sufficient)
-      CONFIG_BT_NIMBLE_ROLE_PERIPHERAL: "y"
-      CONFIG_BT_NIMBLE_ROLE_BROADCASTER: "y"
-      CONFIG_BT_NIMBLE_ROLE_CENTRAL: "n"
-      CONFIG_BT_NIMBLE_ROLE_OBSERVER: "n"
-
-      # Security (bonding + LESC)
-      CONFIG_BT_NIMBLE_SECURITY_ENABLE: "y"
-      CONFIG_BT_NIMBLE_SM_LEGACY: "y"
-      CONFIG_BT_NIMBLE_SM_SC: "y"
+      CONFIG_SOC_WIFI_HE_SUPPORT: y   # Future Wi-Fi 6 Support
+      CONFIG_ESP_WIFI_11AX_SUPPORT: y # Future Wi-Fi 6 Support
 
 esphome:
   name: ${device_name}
@@ -31,20 +17,17 @@ esphome:
       - output.turn_off: ant_gpio3     # LOW -> RF switch power ON
       - output.turn_on:  ant_gpio14    # HIGH -> external antenna (U.FL)
 
-# IMPORTANT: Do NOT include esp32_ble:, esp32_ble_tracker:, or bluetooth_proxy: here.
-# The irk_capture component fully initializes and manages NimBLE itself.
-
 logger:
   level: DEBUG
   baud_rate: 115200
-  hardware_uart: USB_CDC
+  hardware_uart: USB_SERIAL_JTAG
 
 api:
   encryption:
     key: ${api_key}
   reboot_timeout: 15min
 
-ota:
+ ota:
   - platform: esphome
     password: ${ota_password}
     version: 2
@@ -82,22 +65,18 @@ output:
     id: ant_gpio14
     pin: GPIO14
 
-# Pull irk_capture external component (ESP-IDF NimBLE version)
-external_components:
-  - source:
-      type: git
-      url: https://github.com/DerekSeaman/irk-capture
-      ref: main
-    components: [irk_capture]
-    refresh: 1min
+# BLE scanning and Bluetooth proxy for Home Assistant
+esp32_ble_tracker:
+  scan_parameters:
+    active: true
+    interval: 211ms
+    window: 180ms
+    continuous: true
 
-# Configure the custom IRK capture component
-irk_capture:
-  id: irk
-  ble_name: "IRK Capture"
-  start_on_boot: true
+bluetooth_proxy:
+  active: true
 
-# Text sensors for Wi-Fi info and IRK capture
+# Text sensors for Wi-Fi info
 text_sensor:
   - platform: wifi_info
     bssid:
@@ -107,24 +86,8 @@ text_sensor:
       name: "IP"
       entity_category: diagnostic
 
-  - platform: irk_capture
-    irk_capture_id: irk
-    last_irk:
-      name: "IRK"
-      id: last_irk
-    last_address:
-      name: "Device MAC"
-      id: last_addr
-
-# BLE advertising on/off (drives start/stop advertising)
+# Switches
 switch:
-  - platform: irk_capture
-    irk_capture_id: irk
-    advertising:
-      id: ble_advertising
-      name: "BLE Advertising"
-      restore_mode: ALWAYS_OFF
-
   # External antenna selector (FM8625H RF switch control)
   - platform: template
     name: "External Antenna"
@@ -136,25 +99,6 @@ switch:
     turn_off_action:
       - output.turn_off: ant_gpio3     # LOW -> RF switch power ON
       - output.turn_off: ant_gpio14    # LOW -> internal antenna (PCB/RF1)
-
-# Buttons
-button:
-  - platform: irk_capture
-    irk_capture_id: irk
-    new_mac:
-      id: new_mac_btn
-      name: "Generate New MAC"
-  - platform: restart
-    name: "Restart Device"
-
-# Text input to change the BLE name dynamically
-text:
-  - platform: irk_capture
-    irk_capture_id: irk
-    ble_name:
-      id: ble_name_input
-      name: "BLE Device Name"
-      mode: text
 
 # Diagnostics and basics
 sensor:

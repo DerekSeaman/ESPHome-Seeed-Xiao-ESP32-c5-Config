@@ -4,9 +4,5 @@ substitutions:
   api_key: "ZmFrZWFwaWtleWZha2VleGFtcGxlZmFrZWtleQ=="
   ota_password: "ChangeMe!2025"
 
-esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
-
 packages:
   device: !include "common/Seeed xiao ESP32-c6 base.yaml"

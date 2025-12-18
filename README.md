@@ -1,6 +1,6 @@
 # Seeed XIAO ESP32‑C6 ESPHome Device Builder Package
 
-This repository contains a reusable **ESPHome Device Builder package** for the Seeed XIAO ESP32‑C6 (esp32c6) boards. The project provides a shared base configuration package that can be included in device YAMLs to keep device files concise and consistent. The configuration is tailored for Home Assistant Bluetooth proxy and scanning functionality. I use it with the "Bermuda BLE Trilateration" HACS add-on for room-level presence detection. 
+This repository contains a reusable **ESPHome Device Builder package** for the Seeed XIAO ESP32‑C6 (esp32c6) boards. The project provides a shared base configuration package that can be included in device YAMLs to keep device files concise and consistent. The configuration is tailored for Home Assistant Bluetooth proxy and scanning functionality. I use it with the "Bermuda BLE Trilateration" HACS add-on for room-level presence detection.
 
 Quick overview
 
@@ -12,11 +12,13 @@ Quick overview
 
   - `examples/common/Seeed xiao ESP32-c6 base.yaml` — shared base configuration (board, wifi, API/OTA, sensors, antenna outputs).
 
+  - `examples/common/Seeed xiao ESP32-c6 base IRK.yaml` — IRK capture variant base configuration.
+
 ![Seeed XIAO ESP32-C6 PCB](docs/seeed%20c6%20pcb.jpg)
 
 ## How to use the base package
 
-The generic device YAML includes the ESP32-C6 base configuration via `packages` and provide substitutions:
+The generic device YAML includes the ESP32-C6 base configuration via `packages` and provides substitutions:
 
 ```yaml
 substitutions:
@@ -25,23 +27,19 @@ substitutions:
   api_key: "ZmFrZWFwaWtleWZha2VleGFtcGxlZmFrZWtleQ=="
   ota_password: "ChangeMe!2025"
 
-esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
-
 packages:
   device: !include "common/Seeed xiao ESP32-c6 base.yaml"
 ```
 
-The base configuration uses the `${api_key}` and `${ota_password}` from your device specific YAML, and uses `!secret` for Wi‑Fi values (managed by ESPHome Builder).
+The base configuration uses the `${api_key}` and `${ota_password}` from your device specific YAML, uses `!secret` for Wi‑Fi values (managed by ESPHome Builder), and handles the `esphome:` section automatically.
 
 What the base config provides:
 
-- Board & SDK: selects `esp32c6` variant and `seeed_xiao_esp32c6` board, and sets `esp-idf` sdkconfig options.
+- Board & SDK: selects `esp32c6` variant and `seeed_xiao_esp32c6` board with `esp-idf` framework.
 
-- Boot actions: toggles GPIOs used for antenna selection on boot.
+- Boot actions: toggles GPIO3 and GPIO14 used for antenna selection on boot (FM8625H RF switch).
 
-- Logger & status LED: configures serial log level and board LED behavior.
+- Logger & status LED: configures serial log level (USB_SERIAL_JTAG) and board LED (GPIO15) behavior.
 
 - API & OTA: supports encrypted API (uses `${api_key}`) and OTA (uses `${ota_password}`).
 
@@ -51,15 +49,29 @@ What the base config provides:
 
 - Sensors: uptime, internal temperature, Wi‑Fi signal, Wi‑Fi info, and SNTP time.
 
-- Antenna control: a template switch manages two outputs (`ant_gpio3`, `ant_gpio14`) defined in the base.
+- Antenna control: a template switch manages two outputs (`ant_gpio3`, `ant_gpio14`) for FM8625H RF switch control.
 
 ## IRK Capture Variant
 
 This repository also includes an alternate configuration for capturing iPhone, Apple Watch, and Android BLE Identity Resolving Keys (IRKs):
 
 - **Base config**: `examples/common/Seeed xiao ESP32-c6 base IRK.yaml` — uses ESP-IDF framework with NimBLE for IRK capture
+- **Device example**: `examples/ESPHome device config C6 IRK.yaml` — minimal device configuration for IRK capture
 
 The IRK variant provides the same base features (antenna control, WiFi, sensors) but adds IRK capture functionality through the [irk-capture](https://github.com/DerekSeaman/irk-capture) external component.
+
+**Device YAML example for IRK capture:**
+
+```yaml
+substitutions:
+  device_name: esphomec6-garage
+  friendly_name: Garage C6
+  api_key: "ZmFrZWFwaWtleWZha2VleGFtcGxlZmFrZWtleQ=="
+  ota_password: "ChangeMe!2025"
+
+packages:
+  device: !include "common/Seeed xiao ESP32-c6 base IRK.yaml"
+```
 
 **Key differences from the standard base:**
 
@@ -79,7 +91,7 @@ The IRK variant provides the same base features (antenna control, WiFi, sensors)
 
 ## Using with ESPHome Device Builder
 
-This is an **ESPHome Device Builder package** designed to work seamlessly with the ESPHome Device Builder tool in Home Assistant:
+This is an **ESPHome Device Builder package** designed to work seamlessly with the ESPHome Builder tool in Home Assistant:
 
 1. Install the ESPHome and ESPHome Device Builder add-ons from the Home Assistant Add-on Store
 2. In your ESPHome configuration directory, create a `common` folder:
@@ -93,7 +105,7 @@ This is an **ESPHome Device Builder package** designed to work seamlessly with t
 
 3. Copy the `Seeed xiao ESP32-c6 base.yaml` file to the `config/esphome/common/` directory
    - For IRK capture functionality, use `Seeed xiao ESP32-c6 base IRK.yaml` instead (see [IRK Capture Variant](#irk-capture-variant) section)
-4. Create your device YAML using the exact contents of `examples/ESPHome device config.yaml`:
+4. Create your device YAML using the minimal structure shown above:
    - Update the `device_name` and `friendly_name` substitutions for your specific device
    - Generate new `api_key` and `ota_password` values (ESPHome Builder can generate these)
    - The file should include the base via `packages: device: !include "common/Seeed xiao ESP32-c6 base.yaml"`
@@ -123,10 +135,19 @@ Here's what the device looks like in Home Assistant's ESPHome integration:
 ![ESPHome Device Page](docs/screenshot-1.jpg)
 
 The device page shows:
+
 - **Device info**: Board type, firmware version, and MAC address
 - **Controls**: External antenna toggle switch
 - **Configuration**: Firmware management and OTA updates
 - **Diagnostic**: BSSID, internal temperature, IP address, uptime, and Wi-Fi signal strength
+
+## IRK Capture Device Page
+
+Here's what the IRK capture variant looks like in Home Assistant:
+
+![IRK Capture Device Page](docs/screenshot-irk.jpg)
+
+The IRK capture device page includes all the standard features plus IRK-specific controls for capturing and managing iOS/Android BLE Identity Resolving Keys for presence detection.
 
 ## IRK Capture Troubleshooting
 

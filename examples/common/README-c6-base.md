@@ -53,17 +53,26 @@ Key sections and what they do
 
   - `ap` sets a fallback captive AP with its own `ssid` and `password` (`wifi_captive`).
 
+  - `on_disconnect`: increments a counter (`_wifi_disconnects_since_boot`) each time Wi-Fi disconnects, exposed via a template sensor for diagnostics.
+
 - `captive_portal`, `mdns`:
 
   - Standard ESPHome helpers. `captive_portal` allows fallback setup; `mdns` enables local name discovery.
 
 - Bluetooth / BLE
 
-  - `esp32_ble_tracker` and `bluetooth_proxy`: enable BLE scanning and proxying. The base sets the BLE scan to `active: true`.
+  - `esp32_ble_tracker` and `bluetooth_proxy`: enable BLE scanning and proxying for Home Assistant presence detection.
 
-- `sensor` / `text_sensor` / `time`:
+  - BLE scan parameters are configurable via a `select` entity with two profiles:
+    - **Aggressive** (default): 160ms interval, 160ms window (100% duty cycle) — maximum presence detection accuracy
+    - **Balanced**: 320ms interval, 160ms window (50% duty cycle) — reduced power consumption
+    - Profile selection persists across reboots via `restore_value: true`
 
-  - Adds common sensors: uptime (converted to hours), internal temperature, Wi‑Fi signal, Wi‑Fi info (BSSID, IP), and SNTP time source.
+- `sensor` / `text_sensor` / `time` / `globals`:
+
+  - Adds common sensors: uptime (converted to hours), internal temperature, Wi‑Fi RSSI, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi-Fi disconnects (since boot), and SNTP time source.
+
+  - `globals`: defines `_wifi_disconnects_since_boot` counter (not restored on reboot) tracked by the Wi-Fi `on_disconnect` handler.
 
 - `switch` (External Antenna)
 

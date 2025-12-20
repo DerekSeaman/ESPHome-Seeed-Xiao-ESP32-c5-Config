@@ -43,11 +43,14 @@ What the base config provides:
 
 - API & OTA: supports encrypted API (uses `${api_key}`) and OTA (uses `${ota_password}`).
 
-- Wi‑Fi: uses `!secret` for `wifi_ssid`, `wifi_password`, and `wifi_captive`; provides fallback captive AP settings.
+- Wi‑Fi: uses `!secret` for `wifi_ssid`, `wifi_password`, and `wifi_captive`; provides fallback captive AP settings with disconnect tracking.
 
-- BLE: enables BLE scanning and Bluetooth proxying with optimized scan parameters (211ms interval, 180ms window, continuous scanning) for accurate presence detection.
+- BLE: enables BLE scanning and Bluetooth proxying with configurable scan profiles:
+  - **Aggressive** (default): 160ms interval, 160ms window (100% duty cycle) for maximum presence detection accuracy
+  - **Balanced**: 320ms interval, 160ms window (50% duty cycle) for reduced power consumption
+  - Profile selection persists across reboots
 
-- Sensors: uptime, internal temperature, Wi‑Fi signal, Wi‑Fi info, and SNTP time.
+- Sensors: uptime, internal temperature, Wi‑Fi RSSI, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi‑Fi disconnects (since boot), and SNTP time.
 
 - Antenna control: a template switch manages two outputs (`ant_gpio3`, `ant_gpio14`) for FM8625H RF switch control.
 
@@ -137,9 +140,9 @@ Here's what the device looks like in Home Assistant's ESPHome integration:
 The device page shows:
 
 - **Device info**: Board type, firmware version, and MAC address
-- **Controls**: External antenna toggle switch
+- **Controls**: BLE Scan Profile selector (Aggressive/Balanced) and External Antenna toggle switch
 - **Configuration**: Firmware management and OTA updates
-- **Diagnostic**: BSSID, internal temperature, IP address, uptime, and Wi-Fi signal strength
+- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
 
 ## IRK Capture Device Page
 
@@ -147,7 +150,13 @@ Here's what the IRK capture variant looks like in Home Assistant:
 
 ![IRK Capture Device Page](docs/screenshot-irk.jpg)
 
-The IRK capture device page includes all the standard features plus IRK-specific controls for capturing and managing iOS/Android BLE Identity Resolving Keys for presence detection.
+The IRK capture device page shows:
+
+- **Device info**: Board type, firmware version, and MAC address
+- **Controls**: BLE Advertising toggle, BLE Device Name input, External Antenna toggle, and Generate New MAC button
+- **Sensors**: IRK (captured Identity Resolving Key) and Device MAC (paired device address)
+- **Configuration**: Firmware management and OTA updates
+- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
 
 ## IRK Capture Troubleshooting
 

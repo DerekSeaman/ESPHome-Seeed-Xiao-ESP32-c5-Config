@@ -89,11 +89,6 @@ output:
       id: ant_gpio14
       pin: GPIO14
 
-# Dashboard import for ESPHome adoption
-dashboard_import:
-    package_import_url: github://DerekSeaman/irk-capture/ESPHome%20Devices/irk-capture-base.yaml@main
-    import_full_config: false
-
 # Pull irk_capture external component (ESP‑IDF NimBLE version)
 external_components:
     - source:

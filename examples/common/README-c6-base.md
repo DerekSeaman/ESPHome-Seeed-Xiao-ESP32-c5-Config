@@ -21,7 +21,7 @@ Key sections and what they do
 
   - `name: ${device_name}` and `friendly_name: ${friendly_name}`: the base config now includes these, so device YAMLs no longer need to define the `esphome:` section — just provide the substitutions.
 
-  - `on_boot`: runs actions when the device boots. The base toggles GPIO3 and GPIO14 outputs used for antenna selection via the FM8625H RF switch (turning the external antenna on/off). If you add hardware that uses these pins, be aware of these actions.
+  - `on_boot`: runs actions when the device boots. The base toggles `RF_SWITCH_EN` (GPIO3) and `RF_ANT_SELECT` (GPIO14) outputs used for antenna selection via the FM8625H RF switch (turning the external antenna on/off). These pin aliases are provided by the ESPHome 2025.12+ board definition. If you add hardware that uses these pins, be aware of these actions.
 
 - `logger`:
 
@@ -63,9 +63,10 @@ Key sections and what they do
 
   - `esp32_ble_tracker` and `bluetooth_proxy`: enable BLE scanning and proxying for Home Assistant presence detection.
 
-  - BLE scan parameters are configurable via a `select` entity with two profiles:
-    - **Aggressive** (default): 160ms interval, 160ms window (100% duty cycle) — maximum presence detection accuracy
-    - **Balanced**: 320ms interval, 160ms window (50% duty cycle) — reduced power consumption
+  - BLE scan parameters are configurable via a `select` entity with three profiles:
+    - **Low**: 320ms interval, 30ms window (9% duty cycle) — minimal power consumption
+    - **Medium** (default): 320ms interval, 90ms window (28% duty cycle) — balanced performance
+    - **High**: 320ms interval, 160ms window (50% duty cycle) — maximum presence detection accuracy
     - Profile selection persists across reboots via `restore_value: true`
 
 - `sensor` / `text_sensor` / `time` / `globals`:
@@ -76,11 +77,11 @@ Key sections and what they do
 
 - `switch` (External Antenna)
 
-  - A template switch controls two GPIO outputs (`ant_gpio3` and `ant_gpio14`) to toggle internal/external antenna via the FM8625H RF switch. GPIO3 controls RF switch power (LOW = ON), GPIO14 selects antenna (HIGH = external U.FL, LOW = internal PCB). The outputs themselves are defined in the `output:` section.
+  - A template switch controls two GPIO outputs (`rf_switch_enable` and `rf_antenna_select`) to toggle internal/external antenna via the FM8625H RF switch. `RF_SWITCH_EN` (GPIO3) controls RF switch power (LOW = ON), `RF_ANT_SELECT` (GPIO14) selects antenna (HIGH = external U.FL, LOW = internal PCB). The outputs themselves are defined in the `output:` section.
 
 - `output`:
 
-  - Defines the actual GPIO3 and GPIO14 outputs used for FM8625H RF switch antenna selection. If you repurpose these pins, update this section and the `switch` actions accordingly.
+  - Defines the `RF_SWITCH_EN` and `RF_ANT_SELECT` outputs using ESPHome 2025.12+ board pin aliases for FM8625H RF switch antenna selection. These aliases map to GPIO3 and GPIO14 respectively. If you repurpose these pins, update this section and the `switch` actions accordingly.
 
 Substitutions and secrets
 

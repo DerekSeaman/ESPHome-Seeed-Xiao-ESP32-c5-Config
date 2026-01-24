@@ -26,13 +26,13 @@ esphome:
     friendly_name: ${friendly_name}
     project:
         name: "derekseaman.irk-capture"
-        version: "1.5.1"
+        version: "1.5.4"
     on_boot:
         priority: -10
         then:
             # Enable external antenna by default (FM8625H RF switch)
-            - output.turn_off: ant_gpio3     # LOW -> RF switch power ON
-            - output.turn_on:  ant_gpio14    # HIGH -> external antenna (U.FL)
+            - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
+            - output.turn_on: rf_antenna_select    # HIGH -> external antenna (U.FL)
 
 # IMPORTANT: Do NOT include esp32_ble:, esp32_ble_tracker:, or bluetooth_proxy: here.
 # The irk_capture component fully initializes and manages NimBLE itself.
@@ -79,15 +79,16 @@ status_led:
     pin:
         number: GPIO15
 
-# External antenna control (GPIO3 power, GPIO14 select - FM8625H RF switch)
+# External antenna control using ESPHome 2025.12+ board aliases (FM8625H RF switch)
+# RF_SWITCH_EN (GPIO3) = RF switch power, RF_ANT_SELECT (GPIO14) = antenna selector
 output:
     - platform: gpio
-      id: ant_gpio3
-      pin: GPIO3
+      id: rf_switch_enable
+      pin: RF_SWITCH_EN
 
     - platform: gpio
-      id: ant_gpio14
-      pin: GPIO14
+      id: rf_antenna_select
+      pin: RF_ANT_SELECT
 
 # Pull irk_capture external component (ESP‑IDF NimBLE version)
 external_components:
@@ -149,11 +150,11 @@ switch:
       optimistic: true
       restore_mode: ALWAYS_ON
       turn_on_action:
-          - output.turn_off: ant_gpio3     # LOW -> RF switch power ON
-          - output.turn_on:  ant_gpio14    # HIGH -> external antenna (U.FL/RF2)
+          - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
+          - output.turn_on: rf_antenna_select    # HIGH -> external antenna (U.FL/RF2)
       turn_off_action:
-          - output.turn_off: ant_gpio3     # LOW -> RF switch power ON
-          - output.turn_off: ant_gpio14    # LOW -> internal antenna (PCB/RF1)
+          - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
+          - output.turn_off: rf_antenna_select   # LOW -> internal antenna (PCB/RF1)
 
 # Buttons
 button:

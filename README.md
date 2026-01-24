@@ -16,7 +16,7 @@ Quick overview
 
 ![Seeed XIAO ESP32-C6 PCB](docs/seeed%20c6%20pcb.jpg)
 
-**Note:** The Seeed XIAO ESP32-C6 board is officially supported in ESPHome as of version 2025.12.0 (December 2025). The board definition includes GPIO aliases and RF switch pin definitions (GPIO3 = `RF_SWITCH_EN`, GPIO14 = `RF_ANT_SELECT`).
+**Requirements:** ESPHome 2025.12.0 or later is required for external antenna support. The Seeed XIAO ESP32-C6 board definition added in this version includes GPIO aliases for the FM8625H RF switch (`RF_SWITCH_EN` = GPIO3, `RF_ANT_SELECT` = GPIO14), enabling easy switching between the internal ceramic antenna and external U.FL antenna.
 
 ## How to use the base package
 
@@ -39,7 +39,7 @@ What the base config provides:
 
 - Board & SDK: selects `esp32c6` variant and `seeed_xiao_esp32c6` board with `esp-idf` framework.
 
-- Boot actions: toggles GPIO3 and GPIO14 used for antenna selection on boot (FM8625H RF switch).
+- Boot actions: toggles `RF_SWITCH_EN` and `RF_ANT_SELECT` pins used for antenna selection on boot (FM8625H RF switch).
 
 - Logger & status LED: configures serial log level (USB_SERIAL_JTAG) and board LED (GPIO15) behavior.
 
@@ -48,13 +48,14 @@ What the base config provides:
 - Wi‑Fi: uses `!secret` for `wifi_ssid`, `wifi_password`, and `wifi_captive`; provides fallback captive AP settings with disconnect tracking.
 
 - BLE: enables BLE scanning and Bluetooth proxying with configurable scan profiles:
-  - **Aggressive** (default): 160ms interval, 160ms window (100% duty cycle) for maximum presence detection accuracy
-  - **Balanced**: 320ms interval, 160ms window (50% duty cycle) for reduced power consumption
+  - **Low**: 320ms interval, 30ms window (9% duty cycle) — minimal power consumption
+  - **Medium** (default): 320ms interval, 90ms window (28% duty cycle) — balanced performance
+  - **High**: 320ms interval, 160ms window (50% duty cycle) — maximum presence detection accuracy
   - Profile selection persists across reboots
 
 - Sensors: uptime, internal temperature, Wi‑Fi RSSI, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi‑Fi disconnects (since boot), and SNTP time.
 
-- Antenna control: a template switch manages two outputs (`ant_gpio3`, `ant_gpio14`) for FM8625H RF switch control.
+- Antenna control: a template switch manages two outputs (`rf_switch_enable`, `rf_antenna_select`) for FM8625H RF switch control using ESPHome 2025.12+ board aliases.
 
 ## IRK Capture Variant
 
@@ -142,7 +143,7 @@ Here's what the device looks like in Home Assistant's ESPHome integration:
 The device page shows:
 
 - **Device info**: Board type, firmware version, and MAC address
-- **Controls**: BLE Scan Profile selector (Aggressive/Balanced) and External Antenna toggle switch
+- **Controls**: BLE Scan Profile selector (Low/Medium/High) and External Antenna toggle switch
 - **Configuration**: Firmware management and OTA updates
 - **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
 

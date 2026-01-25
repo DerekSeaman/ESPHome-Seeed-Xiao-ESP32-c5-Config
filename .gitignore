@@ -1,2 +1,5 @@
 # Keep copilot instructions private
 .github/copilot-instructions.md
+
+# macOS system files
+.DS_Store

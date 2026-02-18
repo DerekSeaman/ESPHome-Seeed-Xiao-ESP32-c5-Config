@@ -1,27 +1,25 @@
-# Seeed XIAO ESP32-C6 — C6 Base include (plain-English guide)
+# Seeed XIAO ESP32-C5 — C5 Base include (plain-English guide)
 
 Note: this project uses a project-level `README.md` at the repository root. For the high-level overview and ESPHome Builder setup instructions, see `../README.md`.
 
-This file documents the `Seeed xiao ESP32-c6 base.yaml` package used by device YAMLs in this repo. It explains each section and option in plain English for ESPHome builders so you can quickly understand, customize, and test C6 devices.
+This file documents the `Seeed xiao ESP32-c5 base.yaml` package used by device YAMLs in this repo. It explains each section and option in plain English for ESPHome builders so you can quickly understand, customize, and test C5 devices.
 
 Summary
 
-- Purpose: provide a reusable base configuration for Seeed XIAO ESP32‑C6 boards (esp32c6 variant) so device YAMLs can be small and device-specific.
-- Typical usage: a device YAML uses `packages: device: !include "common/Seeed xiao ESP32-c6 base.yaml"` and provides substitutions like `device_name`, `friendly_name`, `api_key`, and `ota_password`.
+- Purpose: provide a reusable base configuration for Seeed XIAO ESP32‑C5 boards (esp32c5 variant) so device YAMLs can be small and device-specific.
+- Typical usage: a device YAML uses `packages: device: !include "common/Seeed xiao ESP32-c5 base.yaml"` and provides substitutions like `device_name`, `friendly_name`, `api_key`, and `ota_password`.
 
 Key sections and what they do
 
 - `esp32`
 
-  - `variant: esp32c6` and `board: seeed_xiao_esp32c6`: selects the C6 hardware and board definition.
+  - `variant: ESP32C5`, `board: esp32-c5-devkitc-1`, and `flash_size: 8MB`: selects the C5 hardware, board definition, and explicitly sets the flash to match the Seeed XIAO ESP32-C5's onboard 8 MB flash chip.
 
-  - `framework: esp-idf` and `sdkconfig_options`: sets low-level SDK flags (here enabling future Wi‑Fi 6 related options). Leave these unless you need to change SDK behaviour.
+  - `framework: esp-idf` and `sdkconfig_options`: enables dual-band Wi‑Fi 6 support (`CONFIG_SOC_WIFI_HE_SUPPORT`, `CONFIG_ESP_WIFI_11AX_SUPPORT`, `CONFIG_SOC_WIFI_SUPPORT_5G`). Leave these unless you need to change SDK behaviour.
 
 - `esphome`:
 
   - `name: ${device_name}` and `friendly_name: ${friendly_name}`: the base config now includes these, so device YAMLs no longer need to define the `esphome:` section — just provide the substitutions.
-
-  - `on_boot`: runs actions when the device boots. The base toggles `RF_SWITCH_EN` (GPIO3) and `RF_ANT_SELECT` (GPIO14) outputs used for antenna selection via the FM8625H RF switch (turning the external antenna on/off). These pin aliases are provided by the ESPHome 2025.12+ board definition. If you add hardware that uses these pins, be aware of these actions.
 
 - `logger`:
 
@@ -29,7 +27,7 @@ Key sections and what they do
 
 - `status_led`:
 
-  - Configures the board LED pin (GPIO15). LED behavior: solid = all OK, slow blink = Wi-Fi connected but no API client, fast blink = no Wi-Fi.
+  - Configures the board LED pin (GPIO27, yellow USER LED). LED behavior: solid = all OK, slow blink = Wi-Fi connected but no API client, fast blink = no Wi-Fi.
 
 - `api`:
 
@@ -49,7 +47,7 @@ Key sections and what they do
 
   - `fast_connect` and `enable_on_boot` are convenience flags for reconnect behaviour.
 
-  - `ssid`/`password` use `!secret` in the base file — ESPHome Builder manages these automatically.
+  - `ssid`/`password` use `!secret wifi_ssid` and `!secret wifi_password` in the base file — ESPHome Builder manages these automatically. A commented `band: "5GHz"` option is included to force 5 GHz only if needed.
 
   - `ap` sets a fallback captive AP with its own `ssid` and `password` (`wifi_captive`).
 
@@ -75,13 +73,9 @@ Key sections and what they do
 
   - `globals`: defines `_wifi_disconnects_since_boot` counter (not restored on reboot) tracked by the Wi-Fi `on_disconnect` handler.
 
-- `switch` (External Antenna)
+- Antenna control:
 
-  - A template switch controls two GPIO outputs (`rf_switch_enable` and `rf_antenna_select`) to toggle internal/external antenna via the FM8625H RF switch. `RF_SWITCH_EN` (GPIO3) controls RF switch power (LOW = ON), `RF_ANT_SELECT` (GPIO14) selects antenna (HIGH = external U.FL, LOW = internal PCB). The outputs themselves are defined in the `output:` section.
-
-- `output`:
-
-  - Defines the `RF_SWITCH_EN` and `RF_ANT_SELECT` outputs using ESPHome 2025.12+ board pin aliases for FM8625H RF switch antenna selection. These aliases map to GPIO3 and GPIO14 respectively. If you repurpose these pins, update this section and the `switch` actions accordingly.
+  - The C5 uses a hardware-managed LFD182G45DCHD277 RF switch with dedicated `ANT_2G` and `ANT_5G` pins. No `switch:` or `output:` blocks are needed — there is no software-controlled antenna toggle on the C5.
 
 Substitutions and secrets
 
@@ -95,13 +89,13 @@ How device YAMLs use the base
 
   ```yaml
   substitutions:
-    device_name: esphomec6-garage
-    friendly_name: Garage C6
+    device_name: esphomec5-garage
+    friendly_name: Garage C5
     api_key: "..."
     ota_password: "..."
 
   packages:
-    device: !include "common/Seeed xiao ESP32-c6 base.yaml"
+    device: !include "common/Seeed xiao ESP32-c5 base.yaml"
   ```
 
   Note: The `esphome:` section is no longer needed in device YAMLs — the base config now includes `name:` and `friendly_name:` using the substitutions you provide.
@@ -110,7 +104,7 @@ Customization tips
 
 - To change board-specific settings (pins, outputs, sensors), edit the base file only if the change applies to all devices that include it. Otherwise override or extend in the device YAML.
 
-- If you need different antenna pins per device, remove antenna control from the base and define it per-device.
+- Antenna switching is hardware-managed on the C5 — no per-device customization needed.
 
 - Reduce `logger` level from `DEBUG` to `INFO` in production to reduce serial noise.
 

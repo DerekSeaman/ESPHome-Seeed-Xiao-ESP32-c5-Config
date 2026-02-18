@@ -1,6 +1,7 @@
 esp32:
-    variant: esp32c6
-    board: seeed_xiao_esp32c6
+    variant: ESP32C5
+    board: esp32-c5-devkitc-1
+    flash_size: 8MB
     framework:
         type: esp-idf
         version: recommended
@@ -21,18 +22,18 @@ esp32:
             CONFIG_BT_NIMBLE_SM_LEGACY: "y"
             CONFIG_BT_NIMBLE_SM_SC: "y"
 
+            # C5-specific: dual-band Wi-Fi 6
+            CONFIG_SOC_WIFI_HE_SUPPORT: "y"
+            CONFIG_ESP_WIFI_11AX_SUPPORT: "y"
+            CONFIG_SOC_WIFI_SUPPORT_5G: "y"
+
 esphome:
     name: ${device_name}
     friendly_name: ${friendly_name}
     project:
         name: "derekseaman.irk-capture"
-        version: "1.5.6"
-    on_boot:
-        priority: -10
-        then:
-            # Enable external antenna by default (FM8625H RF switch)
-            - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
-            - output.turn_on: rf_antenna_select    # HIGH -> external antenna (U.FL)
+        version: "1.5.7"
+    # No on_boot needed: C5 antenna switching is hardware-managed (LFD182G45DCHD277)
 
 # IMPORTANT: Do NOT include esp32_ble:, esp32_ble_tracker:, or bluetooth_proxy: here.
 # The irk_capture component fully initializes and manages NimBLE itself.
@@ -74,21 +75,13 @@ captive_portal:
 
 mdns:
 
-# Status LED on Seeed XIAO ESP32-C6 (GPIO15, not inverted to match your working config)
+# Status LED on Seeed XIAO ESP32-C5 (GPIO27, yellow USER LED)
 status_led:
     pin:
-        number: GPIO15
+        number: GPIO27
 
-# External antenna control using ESPHome 2025.12+ board aliases (FM8625H RF switch)
-# RF_SWITCH_EN (GPIO3) = RF switch power, RF_ANT_SELECT (GPIO14) = antenna selector
-output:
-    - platform: gpio
-      id: rf_switch_enable
-      pin: RF_SWITCH_EN
-
-    - platform: gpio
-      id: rf_antenna_select
-      pin: RF_ANT_SELECT
+# No output block needed: C5 uses dedicated hardware ANT_2G/ANT_5G pins,
+# not GPIO-controlled RF switch like the C6 FM8625H
 
 # Pull irk_capture external component (ESP‑IDF NimBLE version)
 external_components:
@@ -143,18 +136,6 @@ switch:
           id: ble_advertising
           name: "BLE Advertising"
           restore_mode: ALWAYS_ON
-
-    # External antenna selector (FM8625H RF switch control)
-    - platform: template
-      name: "External Antenna"
-      optimistic: true
-      restore_mode: ALWAYS_ON
-      turn_on_action:
-          - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
-          - output.turn_on: rf_antenna_select    # HIGH -> external antenna (U.FL/RF2)
-      turn_off_action:
-          - output.turn_off: rf_switch_enable    # LOW -> RF switch power ON
-          - output.turn_off: rf_antenna_select   # LOW -> internal antenna (PCB/RF1)
 
 # Buttons
 button:

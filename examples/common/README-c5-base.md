@@ -47,7 +47,7 @@ Key sections and what they do
 
   - `fast_connect` and `enable_on_boot` are convenience flags for reconnect behaviour.
 
-  - `ssid`/`password` use `!secret wifi_ssid` and `!secret wifi_password` in the base file — ESPHome Builder manages these automatically. A commented `band: "5GHz"` option is included to force 5 GHz only if needed.
+  - `ssid`/`password` use `!secret wifi_ssid` and `!secret wifi_password` in the base file — ESPHome Builder manages these automatically. The `band_mode` option controls band selection: `AUTO` (default), `2.4GHZ`, or `5GHZ` (requires ESPHome 2026.3+).
 
   - `ap` sets a fallback captive AP with its own `ssid` and `password` (`wifi_captive`).
 

@@ -18,7 +18,7 @@ Quick overview
 
 **Key feature:** The ESP32-C5 supports dual-band **2.4 GHz and 5 GHz Wi-Fi 6 (802.11ax)**, making it the first XIAO ESP32 variant with 5 GHz capability. Antenna switching on the C5 is hardware-managed (LFD182G45DCHD277 RF switch) and requires no GPIO control — unlike the C6 which uses a software-controlled FM8625H switch.
 
-> **Tip — separate 2.4 GHz / 5 GHz SSIDs:** If your network uses different SSIDs for each band, define dedicated secrets (e.g., `wifi5_ssid` and `wifi5_password`) and update the `ssid`/`password` references in `Seeed xiao ESP32-c5 base.yaml` to use them. You can also uncomment the `band: "5GHz"` line in that file to force the C5 to connect to the 5 GHz band exclusively.
+> **Tip — separate 2.4 GHz / 5 GHz SSIDs:** If your network uses different SSIDs for each band, define dedicated secrets (e.g., `wifi5_ssid` and `wifi5_password`) and update the `ssid`/`password` references in `Seeed xiao ESP32-c5 base.yaml` to use them. You can also change `band_mode: AUTO` to `band_mode: 5GHZ` in that file to force the C5 to connect to the 5 GHz band exclusively (requires ESPHome 2026.3+).
 
 > **Note — first serial flash (as of February 2026):** ESPHome may fail the first serial flash of a new C5 device with the error: *"Failed to initialize. Try resetting your device or holding the BOOT button while selecting your serial port until it starts preparing the installation."* If this happens, use the following workaround:
 > 1. Download [Tasmota ESP Flasher](https://github.com/Jason2866/ESP_Flasher) to your computer.
@@ -51,7 +51,7 @@ What the base config provides:
 
 - API & OTA: supports encrypted API (uses `${api_key}`) and OTA (uses `${ota_password}`).
 
-- Wi‑Fi: supports dual-band 2.4 GHz and 5 GHz Wi‑Fi 6 (802.11ax). Uses `!secret` for `wifi_ssid`, `wifi_password`, and `wifi_captive`; provides fallback captive AP settings with disconnect tracking. A `band: "5GHz"` option is available in the config to force 5 GHz only.
+- Wi‑Fi: supports dual-band 2.4 GHz and 5 GHz Wi‑Fi 6 (802.11ax). Uses `!secret` for `wifi_ssid`, `wifi_password`, and `wifi_captive`; provides fallback captive AP settings with disconnect tracking. The `band_mode` option (AUTO, 2.4GHZ, 5GHZ) controls band selection natively (requires ESPHome 2026.3+).
 
 - BLE: enables BLE scanning and Bluetooth proxying with configurable scan profiles:
   - **Low**: 320ms interval, 30ms window (9% duty cycle) — minimal power consumption

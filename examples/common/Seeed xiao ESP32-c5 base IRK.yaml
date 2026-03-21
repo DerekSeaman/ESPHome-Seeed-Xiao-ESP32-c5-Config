@@ -61,6 +61,7 @@ wifi:
     power_save_mode: NONE
     fast_connect: true
     enable_on_boot: true
+    band_mode: AUTO   # AUTO | 2.4GHZ | 5GHZ (ESP32-C5 only, requires ESPHome 2026.3+)
     reboot_timeout: 10min
     ap:
         ssid: "${friendly_name} Fallback"

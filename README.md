@@ -14,6 +14,8 @@ Quick overview
 
   - `examples/common/Seeed xiao ESP32-c5 base IRK.yaml` — IRK capture variant base configuration.
 
+  - `examples/common/wifi_helpers.h` — required C++ helper that exposes the ESP-IDF Wi-Fi API to ESPHome template sensor lambdas (must be copied to `config/esphome/common/` on your ESPHome instance).
+
 ![Seeed XIAO ESP32-C5 PCB](docs/seeed%20c5%20pcb.jpg)
 
 **Key feature:** The ESP32-C5 supports dual-band **2.4 GHz and 5 GHz Wi-Fi 6 (802.11ax)**, making it the first XIAO ESP32 variant with 5 GHz capability. Antenna switching on the C5 is hardware-managed (LFD182G45DCHD277 RF switch) and requires no GPIO control — unlike the C6 which uses a software-controlled FM8625H switch.
@@ -59,7 +61,7 @@ What the base config provides:
   - **High**: 320ms interval, 160ms window (50% duty cycle) — maximum presence detection accuracy
   - Profile selection persists across reboots
 
-- Sensors: uptime, internal temperature, Wi‑Fi RSSI, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi‑Fi disconnects (since boot), and SNTP time.
+- Sensors: uptime, internal temperature, Wi‑Fi RSSI, Wi‑Fi Band (2.4 GHz / 5 GHz), Wi‑Fi Channel, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi‑Fi disconnects (since boot), and SNTP time.
 
 ## IRK Capture Variant
 
@@ -104,10 +106,18 @@ This is an **ESPHome Device Builder package** designed to work seamlessly with t
    └── esphome/
        └── common/
            ├── Seeed xiao ESP32-c5 base.yaml      ← Standard BLE proxy config
-           └── Seeed xiao ESP32-c5 base IRK.yaml  ← IRK capture config
+           ├── Seeed xiao ESP32-c5 base IRK.yaml  ← IRK capture config
+           └── wifi_helpers.h                     ← Required C++ header (see below)
    ```
 
-3. Copy the base YAML file(s) to the `config/esphome/common/` directory
+3. Copy the base YAML file(s) **and** `wifi_helpers.h` to the `config/esphome/common/` directory. The `wifi_helpers.h` file exposes the ESP-IDF Wi-Fi API to the Wi-Fi Band and Wi-Fi Channel template sensors. It contains only two lines:
+
+   ```cpp
+   #pragma once
+   #include <esp_wifi.h>
+   ```
+
+   Without this file, the build will fail with: `error: 'esp_wifi_sta_get_ap_info' was not declared in this scope`. ESPHome's `includes:` mechanism injects this header only into the generated `main.cpp`, avoiding the build errors caused by injecting it globally across all ESP-IDF compilation units.
 4. Create your device YAML using the minimal structure shown above:
    - Update the `device_name` and `friendly_name` substitutions for your specific device
    - Generate new `api_key` and `ota_password` values (ESPHome Builder can generate these)
@@ -142,7 +152,7 @@ The device page shows:
 - **Device info**: Board type, firmware version, and MAC address
 - **Controls**: BLE Scan Profile selector (Low/Medium/High)
 - **Configuration**: Firmware management and OTA updates
-- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
+- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi Band, Wi-Fi Channel, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
 
 ## IRK Capture Device Page
 
@@ -156,4 +166,4 @@ The IRK capture device page shows:
 - **Controls**: BLE Advertising toggle, BLE Device Name input, BLE Profile selector, and Generate New MAC button
 - **Sensors**: Device MAC (paired device address), Effective MAC (current BLE advertising address), and IRK (captured Identity Resolving Key)
 - **Configuration**: Firmware management and OTA updates
-- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi disconnects (since boot), and Wi-Fi RSSI
+- **Diagnostic**: BSSID, internal temperature, IP address, MAC address, SSID, uptime, Wi-Fi Band, Wi-Fi Channel, Wi-Fi disconnects (since boot), and Wi-Fi RSSI

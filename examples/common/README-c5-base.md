@@ -21,6 +21,8 @@ Key sections and what they do
 
   - `name: ${device_name}` and `friendly_name: ${friendly_name}`: the base config now includes these, so device YAMLs no longer need to define the `esphome:` section — just provide the substitutions.
 
+  - `includes: [common/wifi_helpers.h]`: injects `<esp_wifi.h>` into the generated `main.cpp` so template sensor lambdas can call `esp_wifi_sta_get_ap_info()`. A `platformio_options: build_flags` approach was tried but injects the header globally across all ESP-IDF compilation units, causing build failures in unrelated files. The `includes:` mechanism correctly scopes it to ESPHome's generated code only. The file must exist at `config/esphome/common/wifi_helpers.h` — see the *Required helper file* section below.
+
 - `logger`:
 
   - `level: DEBUG`, `baud_rate: 115200`, `hardware_uart: USB_SERIAL_JTAG` — controls serial logging level and port. Change `level` to `INFO` or `WARN` on stable devices to reduce logs.
@@ -51,6 +53,8 @@ Key sections and what they do
 
   - `ap` sets a fallback captive AP with its own `ssid` and `password` (`wifi_captive`).
 
+  - `on_connect`: immediately triggers an update of the Wi-Fi Band and Wi-Fi Channel sensors as soon as the device associates with the AP, so values appear in Home Assistant within seconds of boot rather than waiting up to 60 s for the first poll interval.
+
   - `on_disconnect`: increments a counter (`_wifi_disconnects_since_boot`) each time Wi-Fi disconnects, exposed via a template sensor for diagnostics.
 
 - `captive_portal`, `mdns`:
@@ -69,7 +73,9 @@ Key sections and what they do
 
 - `sensor` / `text_sensor` / `time` / `globals`:
 
-  - Adds common sensors: uptime (converted to hours), internal temperature, Wi‑Fi RSSI, Wi‑Fi info (BSSID, IP, SSID, MAC), Wi-Fi disconnects (since boot), and SNTP time source.
+  - Adds common sensors: uptime (converted to hours), internal temperature, Wi‑Fi RSSI, Wi‑Fi Band (text sensor — `"2.4 GHz"` or `"5 GHz"`), Wi‑Fi Channel (integer — e.g. `6` or `100`), Wi‑Fi info (BSSID, IP, SSID, MAC), Wi-Fi disconnects (since boot), and SNTP time source.
+
+  - Wi‑Fi Band and Wi‑Fi Channel are derived from `esp_wifi_sta_get_ap_info()` via the `wifi_helpers.h` include. Both poll every 60 s, are tagged `diagnostic`, and also fire immediately on Wi-Fi connect via the `on_connect` handler.
 
   - `globals`: defines `_wifi_disconnects_since_boot` counter (not restored on reboot) tracked by the Wi-Fi `on_disconnect` handler.
 
@@ -116,6 +122,17 @@ This package is designed for ESPHome Builder in Home Assistant, which automatica
 - Device flashing and OTA updates
 
 See the main `README.md` for complete ESPHome Builder setup instructions.
+
+Required helper file
+
+The base config's `esphome: includes:` block references `common/wifi_helpers.h`. This file must be present at `config/esphome/common/wifi_helpers.h` on your ESPHome instance before building. It is included in this repository at `examples/common/wifi_helpers.h` and contains just two lines:
+
+```cpp
+#pragma once
+#include <esp_wifi.h>
+```
+
+Without it, the build will fail with: `error: 'esp_wifi_sta_get_ap_info' was not declared in this scope`.
 
 Notes and cautions
 

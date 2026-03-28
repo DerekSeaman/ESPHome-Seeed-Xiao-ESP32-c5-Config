@@ -12,6 +12,8 @@ esp32:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  includes:
+    - common/wifi_helpers.h
 
 logger:
   level: DEBUG
@@ -42,6 +44,10 @@ wifi:
     ssid: "${friendly_name} Fallback"
     password: !secret wifi_captive
     ap_timeout: 120s
+  on_connect:
+    then:
+      - component.update: wifi_band_sensor
+      - component.update: wifi_channel_sensor
   on_disconnect:
     then:
       - lambda: |-
@@ -123,7 +129,37 @@ sensor:
     lambda: |-
       return id(_wifi_disconnects_since_boot);
 
+  - platform: template
+    name: "Wi-Fi Channel"
+    id: wifi_channel_sensor
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 60s
+    lambda: |-
+      wifi_ap_record_t ap_info;
+      if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+        return (float) ap_info.primary;
+      }
+      return NAN;
+
 text_sensor:
+  - platform: template
+    name: "Wi-Fi Band"
+    id: wifi_band_sensor
+    entity_category: diagnostic
+    update_interval: 60s
+    lambda: |-
+      wifi_ap_record_t ap_info;
+      if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+        uint8_t ch = ap_info.primary;
+        if (ch >= 1 && ch <= 14) {
+          return {"2.4 GHz"};
+        } else if (ch >= 36) {
+          return {"5 GHz"};
+        }
+      }
+      return {"Unknown"};
+
   - platform: wifi_info
     ip_address:
       name: "IP"

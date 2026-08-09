@@ -1,0 +1,6 @@
+packages:
+  device:
+    url: https://github.com/DerekSeaman/ESPHome-Seeed-Xiao-ESP32-c5-Config
+    ref: dev
+    file: "examples/common/Seeed xiao ESP32-c5 base.yaml"
+    refresh: always

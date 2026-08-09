@@ -17,7 +17,7 @@ esp32:
 
 esphome:
     includes:
-        - examples/wifi_helpers.h
+        - <esp_wifi.h>
     # No on_boot needed: C5 antenna switching is hardware-managed (LFD182G45DCHD277)
 
 logger:

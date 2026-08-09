@@ -17,7 +17,7 @@ Quick overview
 
 ![Seeed XIAO ESP32-C5 PCB](docs/seeed%20c5%20pcb.jpg)
 
-**Key feature:** The ESP32-C5 supports dual-band **2.4 GHz and 5 GHz Wi-Fi 6 (802.11ax)**, making it the first XIAO ESP32 variant with 5 GHz capability. Antenna switching on the C5 is hardware-managed (LFD182G45DCHD277 RF switch) and requires no GPIO control — unlike the C6 which uses a software-controlled switch. I strongly recommend purchasing the Seeed Studio 2.4 GHz antenna, as Wi-Fi reception without it is very poor.
+**Key feature:** The XIAO ESP32-C5 supports dual-band **2.4 GHz and 5 GHz Wi-Fi 6 (802.11ax)**, making it the first XIAO ESP32 variant with 5 GHz capability. Antenna switching on the C5 is hardware-managed (LFD182G45DCHD277 RF switch) and requires no GPIO control — unlike the C6 which uses a software-controlled switch. I strongly recommend purchasing the Seeed Studio 2.4 GHz antenna, as Wi-Fi reception without it is very poor.
 
 ## Using with ESPHome Device Builder
 

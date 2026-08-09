@@ -1,6 +1,6 @@
 packages:
   c5_device:
     url: https://github.com/DerekSeaman/ESPHome-Seeed-Xiao-ESP32-c5-Config
-    ref: dev
+    ref: main
     file: "examples/Seeed XIAO ESP32-c5 proxy.yaml"
     refresh: always

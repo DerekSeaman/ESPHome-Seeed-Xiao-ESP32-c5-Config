@@ -1,0 +1,75 @@
+# Seeed XIAO ESP32-C5 hardware add-on for IRK capture: dual-band (2.4/5GHz) Wi-Fi 6 support,
+# status LED, and the Wi-Fi Band/Channel diagnostics that depend on it. Antenna switching is
+# hardware-managed (LFD182G45DCHD277), no output/GPIO control needed.
+# Intended to be added as a `packages:` entry alongside the generic irk-capture package
+# (https://github.com/DerekSeaman/irk-capture) on top of an ESPHome Device Builder-generated
+# device YAML. Everything the irk-capture package or the device YAML already provides
+# (logger level/baud_rate, api, wifi credentials/power/roaming/disconnect-tracking, mdns,
+# BLE/IRK capture, MAC/SSID/RSSI diagnostics, restart button, globals, sntp time) is
+# intentionally left out here to avoid duplicating/conflicting with those.
+
+esp32:
+    # Explicit board ID (not just variant) for correct board-specific defaults.
+    board: seeed_xiao_esp32c5
+    flash_size: 8MB
+    framework:
+        sdkconfig_options:
+            # C5-specific: dual-band Wi-Fi 6
+            CONFIG_SOC_WIFI_HE_SUPPORT: "y"
+            CONFIG_ESP_WIFI_11AX_SUPPORT: "y"
+            CONFIG_SOC_WIFI_SUPPORT_5G: "y"
+
+esphome:
+    includes:
+        - <esp_wifi.h>
+    # No on_boot needed: C5 antenna switching is hardware-managed (LFD182G45DCHD277)
+
+logger:
+    hardware_uart: USB_SERIAL_JTAG
+
+wifi:
+    domain: .local
+    band_mode: AUTO   # AUTO | 2.4GHZ | 5GHZ (ESP32-C5 only, requires ESPHome 2026.3+)
+    enable_btm: true  # 802.11v BSS Transition Management (AP-coordinated roaming)
+    enable_rrm: true  # 802.11k Radio Resource Management (neighbor-assisted scanning)
+    on_connect:
+        then:
+            - component.update: wifi_band_sensor
+            - component.update: wifi_channel_sensor
+
+# Status LED on Seeed XIAO ESP32-C5 (GPIO27, yellow USER LED)
+status_led:
+    pin:
+        number: GPIO27
+
+text_sensor:
+    - platform: template
+      name: "Wi-Fi Band"
+      id: wifi_band_sensor
+      entity_category: diagnostic
+      update_interval: 60s
+      lambda: |-
+          wifi_ap_record_t ap_info;
+          if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+            uint8_t ch = ap_info.primary;
+            if (ch >= 1 && ch <= 14) {
+              return {"2.4 GHz"};
+            } else if (ch >= 36) {
+              return {"5 GHz"};
+            }
+          }
+          return {"Unknown"};
+
+sensor:
+    - platform: template
+      name: "Wi-Fi Channel"
+      id: wifi_channel_sensor
+      entity_category: diagnostic
+      accuracy_decimals: 0
+      update_interval: 60s
+      lambda: |-
+          wifi_ap_record_t ap_info;
+          if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+            return (float) ap_info.primary;
+          }
+          return NAN;

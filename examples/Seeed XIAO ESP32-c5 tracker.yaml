@@ -1,5 +1,5 @@
 esp32:
-  board: esp32-c5-devkitc-1
+  board: seeed_xiao_esp32c5
   flash_size: 8MB
   framework:
     type: esp-idf
@@ -10,7 +10,7 @@ esp32:
 
 esphome:
   includes:
-    - common/wifi_helpers.h
+    - wifi_helpers.h
 
 logger:
   level: DEBUG

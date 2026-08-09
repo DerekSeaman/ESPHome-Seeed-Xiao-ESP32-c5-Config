@@ -6,8 +6,7 @@
 
 esp32:
     # Explicit board ID (not just variant) for correct board-specific defaults.
-    # No dedicated Seeed XIAO C5 board definition yet, so this uses the closest devkit.
-    board: esp32-c5-devkitc-1
+    board: seeed_xiao_esp32c5
     flash_size: 8MB
     framework:
         sdkconfig_options:
@@ -18,7 +17,7 @@ esp32:
 
 esphome:
     includes:
-        - common/wifi_helpers.h
+        - wifi_helpers.h
     # No on_boot needed: C5 antenna switching is hardware-managed (LFD182G45DCHD277)
 
 logger:

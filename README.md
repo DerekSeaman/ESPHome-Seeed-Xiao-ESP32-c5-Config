@@ -1,6 +1,6 @@
 # Seeed Studio XIAO ESP32‑C5 ESPHome Device Builder Package
 
-This repository contains a reusable **ESPHome Device Builder package** for the Seeed Studio XIAO ESP32‑C5 (esp32c5) boards. Several configurations are provided for you to choose from. Each configuration is covered below. These are designed to work with ESPHome Builder 2026.7 and later.
+This repository contains a reusable **ESPHome Device Builder package** for the Seeed Studio XIAO ESP32‑C5 (esp32c5) boards. Several configurations are provided for you to choose from. Each configuration is covered below. These are designed to work with ESPHome Device Builder 2026.7 and later.
 
 Quick overview
 
@@ -12,7 +12,7 @@ Quick overview
  
   - `examples/Seeed XIAO ESP32-c5 proxy.yaml` — C5 base configuration with customizable Bluetooth proxy functionality
  
-  - `examples/Seeed XIAO ESP32-c5 remote.yaml` — Package definition designed to be used with a generic ESPHome Builder C5 device configuration. This will reference one of the above configurations and dynamically pull it in at compile time.
+  - `examples/Seeed XIAO ESP32-c5 remote.yaml` — Package definition designed to be used with a generic ESPHome Device Builder C5 device configuration. This will reference one of the above configurations and dynamically pull it in at compile time.
 
 
 ![Seeed XIAO ESP32-C5 PCB](docs/seeed%20c5%20pcb.jpg)
@@ -21,15 +21,15 @@ Quick overview
 
 ## Using with ESPHome Device Builder
 
-This is an **ESPHome Device Builder package** designed to work seamlessly with the ESPHome Builder tool in Home Assistant. This has been tested with ESPHome Builder 2026.7.4. Follow these steps to create a new device with the custom Seeed Studio XIAO ESP32-C5 configuration:
+This is an **ESPHome Device Builder package** designed to work seamlessly with the ESPHome Device Builder tool in Home Assistant. This has been tested with ESPHome Device Builder 2026.7.4. Follow these steps to create a new device with the custom Seeed Studio XIAO ESP32-C5 configuration:
 
 1. Install the **ESPHome Device Builder** add-on from the Home Assistant Add-on Store
-2. Go into the **ESPHome Builder** and in the upper right click on **+ Create device**
+2. Go into the **ESPHome Device Builder** and in the upper right click on **+ Create device**
 3. Select **Create new project**
 4. Click on **ESP32-C5**, then type **Seeed** in the search boards field
 5. Click **+ Select** on the **Seeed Studio XIAO ESP32C5** card
 6. Enter a device name, click **Finish Setup**
-7. Paste the contents of the C5 remote file to the bottom of your ESPHome Builder template [C5 Remote File](https://github.com/DerekSeaman/ESPHome-Seeed-Xiao-ESP32-c5-Config/blob/main/examples/Seeed%20XIAO%20ESP32-c5%20remote.yaml)
+7. Paste the contents of the C5 remote file to the bottom of your ESPHome Device Builder template [C5 Remote File](https://github.com/DerekSeaman/ESPHome-Seeed-Xiao-ESP32-c5-Config/blob/main/examples/Seeed%20XIAO%20ESP32-c5%20remote.yaml)
 8. Depending on which version you want, modify **file:** as needed (proxy, base, IRK)
 9. Modify any other settings as needed, then install to your Seeed Studio XIAO ESP32-C5 device.
 
@@ -43,7 +43,7 @@ I built a special C5 IRK configuration that is designed to be used with my IRK C
 
 ## Wi-Fi Considerations
 
-The base configuration has the Wi-Fi band set to AUTO. This means it will use both the 2.4 GHz and 5 GHz bands. If you have a dedicated 5 GHz SSID, I suggest creating new 5 GHz secrets in ESPHome Builder. I personally use “wifi5_ssid” and “wifi5_password”. Then modify your device configuration to use the 5 GHz secrets. I’ve also enabled the 802.11v and 802.11k features to help with roaming.
+The base configuration has the Wi-Fi band set to AUTO. This means it will use both the 2.4 GHz and 5 GHz bands. If you have a dedicated 5 GHz SSID, I suggest creating new 5 GHz secrets in ESPHome Device Builder. I personally use “wifi5_ssid” and “wifi5_password”. Then modify your device configuration to use the 5 GHz secrets. I’ve also enabled the 802.11v and 802.11k features to help with roaming.
 
 ## Bluetooth Proxy
 

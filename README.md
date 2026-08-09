@@ -1,10 +1,8 @@
-# Seeed XIAO ESP32‑C5 ESPHome Device Builder Package
+# Seeed Studio XIAO ESP32‑C5 ESPHome Device Builder Package
 
 This repository contains a reusable **ESPHome Device Builder package** for the Seeed Studio XIAO ESP32‑C5 (esp32c5) boards. Several configurations are provided for you to choose from. Each configuration is covered below. These are designed to work with ESPHome Builder 2026.7 and later.
 
 Quick overview
-
-- Purpose: Reusable ESPHome Device builder configurations for Seeed XIAO ESP32‑C5 boards
 
 - Layout:
 
@@ -43,13 +41,13 @@ Your configuration should look something like this, except for ‘ref’ pointin
 
 I built a special C5 IRK configuration that is designed to be used with my IRK Capture package for ESPHome. It can be found at: [DerekSeaman/irk-capture](https://github.com/DerekSeaman/irk-capture). This eliminates some of the duplicate settings already built into my IRK Capture package and only adds the unique settings needed for the Seeed Studio XIAO ESP32-C5.
 
-## 5 GHz Wi-Fi Considerations
+## Wi-Fi Considerations
 
-The base configuration has the Wi-Fi band set to AUTO. This means it will use both the 2.4 GHz and 5 GHz bands. If you have a dedicated 5 GHz SSID, I suggest creating new 5 GHz secrets in ESPHome Builder. I personally use “wifi5_ssid” and “wifi5_password”. Then modify your device configuration to use the 5 GHz secrets. 
+The base configuration has the Wi-Fi band set to AUTO. This means it will use both the 2.4 GHz and 5 GHz bands. If you have a dedicated 5 GHz SSID, I suggest creating new 5 GHz secrets in ESPHome Builder. I personally use “wifi5_ssid” and “wifi5_password”. Then modify your device configuration to use the 5 GHz secrets. I’ve also enabled the 802.11v and 802.11k features to help with roaming.
 
 ## Bluetooth Proxy
 
-If you use the proxy configuration, your C5 will act as a Bluetooth proxy. I created three scan profiles: low, medium, and high. Depending on your needs, you can set the scan profile as needed. If you are using the proxy with room-level presence detection, medium or high is recommended. Otherwise, low should be sufficient and will use less Wi-Fi bandwidth.
+If you use the **proxy** configuration, your C5 will act as a Bluetooth proxy. I created three scan profiles: low, medium, and high. Depending on your needs, you can set the scan profile as needed. If you are using the proxy with room-level presence detection, medium or high is recommended. Otherwise, low should be sufficient and will use less Wi-Fi bandwidth.
 
 ![BLE Scanner Profiles](docs/BLE-proxy.jpg)
 

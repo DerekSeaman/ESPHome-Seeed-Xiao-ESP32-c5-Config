@@ -10,7 +10,7 @@ esp32:
 
 esphome:
   includes:
-    - wifi_helpers.h
+    - examples/wifi_helpers.h
 
 logger:
   level: DEBUG

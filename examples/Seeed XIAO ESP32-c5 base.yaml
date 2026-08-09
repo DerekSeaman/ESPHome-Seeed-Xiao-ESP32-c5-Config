@@ -4,7 +4,7 @@
 # Device identity, credentials, and OTA (esphome name/friendly_name, esp32 variant, api key,
 # ota, wifi ssid/password/ap) come from the ESPHome Device Builder-generated device YAML.
 # BLE tracking/proxy (esp32_ble_tracker, bluetooth_proxy) is intentionally excluded — see the
-# "tracker" variant for that.
+# "proxy" variant for that.
 
 esp32:
     # Explicit board ID (not just variant) for correct board-specific defaults.

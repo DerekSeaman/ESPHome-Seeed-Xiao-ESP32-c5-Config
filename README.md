@@ -33,7 +33,7 @@ This is an **ESPHome Device Builder package** designed to work seamlessly with t
 8. Depending on which version you want, modify **file:** as needed (proxy, base, IRK)
 9. Modify any other settings as needed, then install to your Seeed Studio XIAO ESP32-C5 device.
 
-Your configuration should look something like this, except for ‘ref’ pointing to **main**. 
+Your configuration should look something like this, except your `ref:` should point to **main**.
 
 ![YAML Example](docs/YAML-config.jpg)
 
@@ -47,7 +47,13 @@ The base configuration has the Wi-Fi band set to AUTO. This means it will use bo
 
 ## Bluetooth Proxy
 
-If you use the **proxy** configuration, your C5 will act as a Bluetooth proxy. I created three scan profiles: low, medium, and high. Depending on your needs, you can set the scan profile as needed. If you are using the proxy with room-level presence detection, medium or high is recommended. Otherwise, low should be sufficient and will use less Wi-Fi bandwidth.
+If you use the **proxy** configuration, your C5 will act as a Bluetooth proxy with three selectable BLE scan profiles:
+
+- **Low**: 200ms interval, 18.75ms window (9% duty cycle) — minimal power consumption
+- **Medium** (default): 200ms interval, 56.25ms window (28% duty cycle) — balanced performance
+- **High**: 200ms interval, 100ms window (50% duty cycle) — maximum presence detection accuracy
+
+Profile selection persists across reboots. If you are using the proxy with room-level presence detection, medium or high is recommended. Otherwise, low should be sufficient and will use less Wi-Fi bandwidth.
 
 ![BLE Scanner Profiles](docs/BLE-proxy.jpg)
 
